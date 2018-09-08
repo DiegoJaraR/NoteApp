@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
+    <item xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/item_add"
-        android:icon="@android:drawable/ic_menu_add"
+        android:icon="@drawable/pluma"
         android:title="Add"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         app:showAsAction="ifRoom" />
 
 </menu>

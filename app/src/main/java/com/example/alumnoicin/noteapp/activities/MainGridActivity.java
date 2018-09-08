@@ -33,9 +33,10 @@ public class MainGridActivity extends AppCompatActivity implements RealmChangeLi
     private MyAdapter adapter;
     private GridView gridView;
     final Context context = this;
-    String notas, notas2;
-    int posicion;
+    String notas, notas2, auxtext;
+    int posicion, nuevapos, auxcolor;
     private Button btnql;
+
 
 
     private Realm realm;
@@ -86,37 +87,103 @@ public class MainGridActivity extends AppCompatActivity implements RealmChangeLi
         switch (item.getItemId()) {
             case R.id.delete_item:
                 realm.beginTransaction();
-                nota.deleteFromRealm(info.position); // App crash
+                nota.deleteFromRealm(info.position);
                 realm.commitTransaction();
                 return true;
             case R.id.change_item: {
-                // get prompts.xml view
                 posicion = info.position;
                 LayoutInflater li = LayoutInflater.from(context);
                 View promptsView = li.inflate(R.layout.popup, null);
 
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                         context);
-
-                // set prompts.xml to alertdialog builder
                 alertDialogBuilder.setView(promptsView);
-
                 final EditText userInput = (EditText) promptsView
                         .findViewById(R.id.editTextDialogUserInput);
-
-                // set dialog message
                 alertDialogBuilder
                         .setCancelable(false)
                         .setPositiveButton("Ok",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        // get user input and set it to result
-                                        // edit text
                                         notas2 = String.valueOf(userInput.getText());
-
                                         realm.beginTransaction();
                                         nota.get(posicion).setNota(notas2);
                                         realm.commitTransaction();
+                                    }
+                                })
+                        .setNegativeButton("Cancel",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                alertDialog.show();
+                return true;
+            }case R.id.change_color: {
+                posicion = info.position;
+                LayoutInflater li = LayoutInflater.from(context);
+                View promptsView = li.inflate(R.layout.popup_color, null);
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                        context);
+
+                alertDialogBuilder.setView(promptsView).setNegativeButton("Aceptar",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+                ;
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+                //realm.beginTransaction();
+                //nota.get(info.position).setColor(1);
+                //realm.commitTransaction();
+
+                return true;
+            }case R.id.change_position:
+                posicion = info.position;
+                LayoutInflater li = LayoutInflater.from(context);
+                View promptsView = li.inflate(R.layout.popup_position, null);
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                        context);
+                alertDialogBuilder.setView(promptsView);
+                final EditText userInput = (EditText) promptsView
+                        .findViewById(R.id.editText);
+
+                alertDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("Cambiar",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+                                       // nuevapos = Integer.parseInt(userInput.getText().toString());
+                                        nuevapos = Integer.valueOf(userInput.getText().toString());
+                                        int tamaño = nota.size();
+
+                                       if(nuevapos > tamaño){
+                                           Toast.makeText(MainGridActivity.this, "Error de posición", Toast.LENGTH_SHORT).show();
+                                       }else{
+                                           if (nuevapos >= 1) {
+
+
+                                               realm.beginTransaction();
+                                               auxcolor = nota.get(nuevapos-1).getColor();
+                                               auxtext = nota.get(nuevapos-1).getNota();
+                                               nota.get(nuevapos-1).setColor(nota.get(posicion).getColor());
+                                               nota.get(nuevapos-1).setNota(nota.get(posicion).getNota());
+                                               nota.get(posicion).setColor(auxcolor);
+                                               nota.get(posicion).setNota(auxtext);
+                                               realm.commitTransaction();
+                                           }
+                                           else{
+                                               Toast.makeText(MainGridActivity.this, "Error de posición", Toast.LENGTH_SHORT).show();
+                                           }
+                                       }
 
                                     }
                                 })
@@ -127,52 +194,10 @@ public class MainGridActivity extends AppCompatActivity implements RealmChangeLi
                                     }
                                 });
 
-                // create alert dialog
                 AlertDialog alertDialog = alertDialogBuilder.create();
 
-                // show it
                 alertDialog.show();
-
-
-
-                return true;
-            }case R.id.change_color:
-                posicion = info.position;
-                LayoutInflater li = LayoutInflater.from(context);
-                View promptsView = li.inflate(R.layout.popup_color, null);
-
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                        context);
-
-
-
-                // set prompts.xml to alertdialog builder
-                alertDialogBuilder.setView(promptsView).setNegativeButton("Aceptar",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });;
-               // findViewById(R.id.button_amarillo).setOnClickListener(this);
-                //findViewById(R.id.button_blanco).setOnClickListener(this);
-                //findViewById(R.id.button_celeste).setOnClickListener(this);
-                //findViewById(R.id.button_verde).setOnClickListener(this);
-                //findViewById(R.id.button_rojo).setOnClickListener(this);
-
-
-
-
-
-
-
-                // create alert dialog
-                AlertDialog alertDialog = alertDialogBuilder.create();
-
-                // show it
-                alertDialog.show();
-                //realm.beginTransaction();
-                //nota.get(info.position).setColor(1);
-                //realm.commitTransaction();
+                //aqui ocurre la magia!
 
                 return true;
             default:
